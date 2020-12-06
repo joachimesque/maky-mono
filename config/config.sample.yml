@@ -4,6 +4,7 @@ db:
     filename: db/database.sqlite
 telegram:
   token: TELEGRAM_TOKEN
+  restrict_user: YOUR_USER_ID
 twitter:
   enable: false
   consumer_key: TWITTER_CONSUMER_KEY
