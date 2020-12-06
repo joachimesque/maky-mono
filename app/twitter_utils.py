@@ -21,6 +21,6 @@ def tweet(message):
   twitter_api = tweepy.API(twitter_auth)
 
   # Create a tweet
-  twitter_api.update_status(message)
+  twitter_api.update_status(message[:278] + '…')
 
   return True

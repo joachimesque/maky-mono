@@ -58,8 +58,36 @@ The last command returns a string, it is the `access_token` (to be added to the 
 
 ## Usage
 
-Activate venv
+### Cron
+
+Type 
+
+```
+crontab -e
+```
+
+add this line at the end of the file:
+
+```
+30 14 * * * cd /data/profils/joachim/maky-mono && . ./env/bin/activate && python app/queue_handler.py
+```
+
+It will post a link from your queue every day at 14:30 (2:30 pm).
+
+
+### Telegram bot
+
+See https://github.com/python-telegram-bot/python-telegram-bot/wiki/Hosting-your-bot
+
+```
+screen -S makymono
+```
+
+Then start up the bot
 
 ```
 source env/bin/activate
+python app/telegram_handler.py
 ```
+
+If you quit the screen (`Ctrl A D`), you can reattach it with `screen -r makymono`.

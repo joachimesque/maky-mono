@@ -22,7 +22,7 @@ def toot(message):
   )
 
   mastodon.status_post(
-    message,
+    message[:498] + '…',
     visibility=toot_visibility,
   )
 
