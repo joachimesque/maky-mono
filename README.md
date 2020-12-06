@@ -25,6 +25,37 @@ Go talk to [Botfather](https://t.me/botfather) and create your own new bot. It�
 - In the App permissions, select “Read and Write”
 - Create a new set of Access token & secret, and paste them in the config (under the names `access_token` and `access_token_secret`)
 
+#### Mastodon
+
+Open the Python console.
+
+```
+from mastodon import Mastodon
+
+Mastodon.create_app(
+     'YOUR_APP_NAME',
+     api_base_url = 'YOUR_INSTANCE_URL'
+)
+```
+
+This will output a tuple with your `client_id` and `client_secret` (to be added to the config file).
+
+Then,
+
+```
+mastodon = Mastodon(
+    client_id = YOUR_CLIENT_ID,
+    client_secret = YOUR_CLIENT_SECRET,
+    api_base_url = 'YOUR_INSTANCE_URL'
+)
+mastodon.log_in(
+    'MY_EMAIL@mail.com',
+    'MY_PASSWORD_123'
+)
+```
+
+The last command returns a string, it is the `access_token` (to be added to the config file).
+
 ## Usage
 
 Activate venv
