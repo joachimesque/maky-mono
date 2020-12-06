@@ -69,7 +69,7 @@ crontab -e
 add this line at the end of the file:
 
 ```
-30 14 * * * cd /data/profils/joachim/maky-mono && . ./env/bin/activate && python app/queue_handler.py
+30 14 * * * cd PATH_TO/maky-mono && . ./env/bin/activate && python app/queue_handler.py
 ```
 
 It will post a link from your queue every day at 14:30 (2:30 pm).
