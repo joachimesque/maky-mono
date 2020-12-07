@@ -9,9 +9,12 @@ from database_handler import (add_message,
                               delete_message)
 
 import logging
+from telegram import (InlineKeyboardButton,
+                      InlineKeyboardMarkup)
 from telegram.ext import (Updater,
                           CommandHandler,
                           MessageHandler,
+                          CallbackQueryHandler,
                           Filters)
 import datetime
 
@@ -60,9 +63,7 @@ def check_double_message(message_date, message_id):
 
   return False
 
-# START STUFF
-updater = Updater(token=telegram_config['token'], use_context=True)
-dispatcher = updater.dispatcher
+# MAIN HANDLERS
 
 def start(update, context):
   response_text = 'Hello to you, too!'
@@ -90,16 +91,16 @@ def delete(update, context):
       "You can type '/delete next', '/delete last', "
       "or any message number '/delete 666'.")
 
-  for arg in context.args:
-    message_obj = get_message_obj(arg)
+  keyboard = [
+    [
+      InlineKeyboardButton("Delete", callback_data=str(context.args)),
+      InlineKeyboardButton("Cancel", callback_data='False'),
+    ],
+  ]
 
-    if(message_obj):
-      delete_message(message_obj.id)
-      response_text = 'The message was deleted.'
-    else:
-      response_text = 'There was no message to delete.'
-    
-  context.bot.send_message(chat_id=update.effective_chat.id, text=response_text)
+  reply_markup = InlineKeyboardMarkup(keyboard)
+
+  update.message.reply_text('Are you sure?', reply_markup=reply_markup)
 
 def post_message(update, context):
   if(update.message):
@@ -156,14 +157,52 @@ def post_message(update, context):
   
   context.bot.send_message(chat_id=update.effective_chat.id, text=status_message)
 
-start_handler = CommandHandler('start', start)
-show_handler = CommandHandler('show', show)
-delete_handler = CommandHandler('delete', delete)
-message_handler = MessageHandler(Filters.text & (~Filters.command), post_message)
+def button(update, context):
+  query = update.callback_query
 
-dispatcher.add_handler(start_handler)
-dispatcher.add_handler(show_handler)
-dispatcher.add_handler(delete_handler)
-dispatcher.add_handler(message_handler)
+  # CallbackQueries need to be answered, even if no notification to the user is needed
+  # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
+  query.answer()
 
-updater.start_polling()
+  if(not bool(query.data)):
+    query.edit_message_text(text='No message has been deleted.')
+
+    return
+
+  args = query.data.strip('][').split(',')
+
+  for arg in args:
+    arg = arg.strip().strip("'")
+    message_obj = get_message_obj(argument=arg)
+
+    if(message_obj):
+      delete_message(message_obj.id)
+      response_text = f'Message {message_obj.id} has been deleted.'
+      
+      if(len(args) > 1):
+        response_text = 'All messages have been deleted.'
+    else:
+      response_text = 'There was no message to delete.'
+    
+  query.edit_message_text(text=response_text)
+
+# START STUFF
+def main():
+  updater = Updater(token=telegram_config['token'], use_context=True)
+  dispatcher = updater.dispatcher
+
+  dispatcher.add_handler(CommandHandler('start', start))
+  dispatcher.add_handler(CommandHandler('show', show))
+  dispatcher.add_handler(CommandHandler('delete', delete))
+  dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), post_message))
+  dispatcher.add_handler(CallbackQueryHandler(button))
+  # Start the Bot
+  updater.start_polling()
+
+  # Run the bot until the user presses Ctrl-C or the process receives SIGINT,
+  # SIGTERM or SIGABRT
+  updater.idle()
+
+
+if __name__ == '__main__':
+    main()
