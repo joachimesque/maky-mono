@@ -1,6 +1,6 @@
 # Maky Mono
 
-## Install
+## Set it up!
 
 Create a `venv` and activate it, then install the required dependencies.
 
@@ -56,7 +56,7 @@ mastodon.log_in(
 
 The last command returns a string, it is the `access_token` (to be added to the config file).
 
-## Usage
+## Start it up!
 
 ### Cron
 
@@ -92,3 +92,15 @@ python app/telegram_handler.py
 ```
 
 If you quit the screen (`Ctrl A D`), you can reattach it with `screen -r makymono`.
+
+## Use it ~~up~~!
+
+Now you can start talking to your Telegram bot (it’s in your contacts since you set it up).
+
+Regular messages get added to the queue.
+
+Commands:
+
+- `/show xxx` shows you a message, replace `xxx` with `next` to see the next message that'll be published, `last` to see the last message added to the queue, or the id of any message (it’s a number)
+- `/delete xxx` deletes a message. Same values are accepted to replace `xxx` than for `/show`. Displays a warning before deleting a message.
+- `/start` has no real function right now.
