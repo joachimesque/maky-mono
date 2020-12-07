@@ -4,6 +4,9 @@ from config import get_config
 twitter_config = get_config()['twitter']
 
 def tweet(message):
+  if(len(message) > 280):
+    message = message[:278] + '…'
+
   # If no config is found, bypass Twitter and output the tweet
   try:
     consumer_key = twitter_config['consumer_key']
@@ -21,6 +24,6 @@ def tweet(message):
   twitter_api = tweepy.API(twitter_auth)
 
   # Create a tweet
-  twitter_api.update_status(message[:278] + '…')
+  twitter_api.update_status(message)
 
   return True

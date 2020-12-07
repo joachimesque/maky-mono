@@ -4,6 +4,9 @@ from config import get_config
 mastodon_config = get_config()['mastodon']
 
 def toot(message):
+  if(len(message) > 500):
+    message = message[:498] + '…'
+
   # If no config is found, bypass Mastodon and output the toot
   try:
     api_base_url = mastodon_config['api_base_url']
@@ -22,7 +25,7 @@ def toot(message):
   )
 
   mastodon.status_post(
-    message[:498] + '…',
+    message,
     visibility=toot_visibility,
   )
 
