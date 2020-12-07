@@ -1,5 +1,9 @@
 # Maky Mono
 
+Maky Mono is a single-user tool to queue messages to be published on Twitter or Mastodon at a later date, the queue is filled by a Telegram bot.
+
+It uses Python 3.
+
 ## Set it up!
 
 Create a `venv` and activate it, then install the required dependencies.
@@ -99,7 +103,11 @@ Now you can start talking to your Telegram bot (it’s in your contacts since yo
 
 Regular messages get added to the queue.
 
-Commands:
+When you share a link from your mobile OS _Share_ menu along with a comment, Telegram sends two message (one with the comment, followed by the link). Maky will try to detect the double-posting and will add up the two messages so they are published as one. The rule is: if two messages are received less than 3 seconds apart and have consecutive message ID numbers, they are to be published together.
+
+Maky doesn't accept images and media messages _(yet)_.
+
+**Commands:**
 
 - `/show xxx` shows you a message, replace `xxx` with `next` to see the next message that'll be published, `last` to see the last message added to the queue, or the id of any message (it’s a number)
 - `/delete xxx` deletes a message. Same values are accepted to replace `xxx` than for `/show`. Displays a warning before deleting a message.
