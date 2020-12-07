@@ -100,6 +100,9 @@ def delete(update, context):
         response_text = "No argument given.\n" \
                         "You can type '/delete next', '/delete last', " \
                         "or any message number '/delete 666'."
+        context.bot.send_message(chat_id=update.effective_chat.id,
+                                 text=response_text)
+        return
 
     keyboard = [
         [
@@ -127,18 +130,18 @@ def post_message(update, context):
 
             if(previous_message_obj):
                 updated_text = f'{previous_message_obj.message}\n{update.message.text}'
-                update_result = edit_message(message=updated_text,
-                                             message_id=previous_message_obj.id,
-                                             date=update.message.date)
+                edit_result = edit_message(message=updated_text,
+                                           message_id=previous_message_obj.id,
+                                           date=update.message.date)
             else:
                 post_result = add_message(message=update.message.text,
                                           message_id=update.message.message_id,
                                           date=update.message.date)
 
             if(post_result):
-                status_message = f'The message {post_result}' \
+                status_message = f'The message {post_result} ' \
                                   'has been added to the queue!'
-            elif(update_result):
+            elif(edit_result):
                 status_message = '(and the other thing, too)'
             else:
                 status_message = 'The message has not added to the queue :('
