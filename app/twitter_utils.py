@@ -1,12 +1,13 @@
-import tweepy
 from config import get_config
+
+import tweepy
 
 twitter_config = get_config()['twitter']
 
 
 def tweet(message):
     if(len(message) > 280):
-        message = f'{message[:278]}…'
+        message = message[:278] + '…'
 
     # If no config is found, bypass Twitter and output the tweet
     try:
@@ -15,7 +16,8 @@ def tweet(message):
         access_token = twitter_config['access_token']
         access_token_secret = twitter_config['access_token_secret']
     except:
-        return print(message)
+        print(message)
+        return
 
     # Authenticate to Twitter
     twitter_auth = tweepy.OAuthHandler(consumer_key, consumer_key_secret)

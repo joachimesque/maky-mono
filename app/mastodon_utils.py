@@ -1,12 +1,13 @@
-from mastodon import Mastodon
 from config import get_config
+
+from mastodon import Mastodon
 
 mastodon_config = get_config()['mastodon']
 
 
 def toot(message):
     if(len(message) > 500):
-        message = f'{message[:498]}…'
+        message = message[:498] + '…'
 
     # If no config is found, bypass Mastodon and output the toot
     try:
@@ -16,7 +17,8 @@ def toot(message):
         access_token = mastodon_config['access_token']
         toot_visibility = mastodon_config['toot_visibility']
     except:
-        return print(message)
+        print(message)
+        return
 
     mastodon = Mastodon(
         api_base_url=api_base_url,
