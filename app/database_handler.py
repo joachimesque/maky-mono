@@ -3,7 +3,15 @@ from pathlib import Path
 
 from config import get_config
 
-from pony.orm import *
+from pony.orm import (Database,
+                      Optional,
+                      PrimaryKey,
+                      Required,
+                      commit,
+                      count,
+                      db_session,
+                      desc,
+                      select)
 
 db_config = get_config()['db']
 

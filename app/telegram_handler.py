@@ -19,7 +19,8 @@ from telegram.ext import (Updater,
 import datetime
 
 # BASIC CONFIG
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+logging_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(format=logging_format,
                     level=logging.INFO)
 telegram_config = get_config()['telegram']
 
@@ -59,7 +60,8 @@ def get_message_obj(argument):
 
 def check_double_message(message_date, message_id):
     last_message_obj = get_last_message()
-    last_message_date = datetime.datetime.fromisoformat(last_message_obj.tg_date)
+    last_message_date = last_message_obj.tg_date
+    last_message_date = datetime.datetime.fromisoformat(last_message_date)
 
     message_minus_three_second = message_date - datetime.timedelta(seconds=3)
 
@@ -118,25 +120,26 @@ def delete(update, context):
 
 def post_message(update, context):
     if(update.message):
-        if(check_user(update.message.chat.id)):
-            check_message_length(update.message.text,
+        message = update.message
+        if(check_user(message.chat.id)):
+            check_message_length(message.text,
                                  update=update,
                                  context=context)
 
-            previous_message_obj = check_double_message(update.message.date,
-                                                        update.message.message_id)
+            previous_obj = check_double_message(message.date,
+                                                message.message_id)
 
             post_result = None
 
-            if(previous_message_obj):
-                updated_text = f'{previous_message_obj.message}\n{update.message.text}'
+            if(previous_obj):
+                updated_text = previous_obj.message + '\n' + message.text
                 edit_result = edit_message(message=updated_text,
-                                           message_id=previous_message_obj.id,
-                                           date=update.message.date)
+                                           message_id=previous_obj.id,
+                                           date=message.date)
             else:
-                post_result = add_message(message=update.message.text,
-                                          message_id=update.message.message_id,
-                                          date=update.message.date)
+                post_result = add_message(message=message.text,
+                                          message_id=message.message_id,
+                                          date=message.date)
 
             if(post_result):
                 status_message = f'The message {post_result} ' \
@@ -150,21 +153,26 @@ def post_message(update, context):
             status_message = 'I don’t know you!'
 
     elif(update.edited_message):
-        if(check_user(update.edited_message.chat.id)):
-            check_message_length(update.edited_message.text,
+        message = update.edited_message
+        if(check_user(message.chat.id)):
+            check_message_length(message.text,
                                  update=update,
                                  context=context)
 
-            message_obj = get_message_by_tg_id(update.edited_message.message_id)
+            message_obj = get_message_by_tg_id(message.message_id)
 
-            post_result = edit_message(message=update.edited_message.text,
-                                       message_id=message_obj.id,
-                                       date=update.edited_message.date)
+            if(message_obj):
+                post_result = edit_message(message=message.text,
+                                           message_id=message_obj.id,
+                                           date=message.date)
 
-            if(post_result):
-                status_message = f'The message {post_result} has been edited!'
+                if(post_result):
+                    status_message = f'The message {post_result} ' \
+                                      'has been edited!'
+                else:
+                    status_message = 'The message has not been edited :('
             else:
-                status_message = 'The message has not been edited :('
+                status_message = 'The message doesn’t exit :('
 
         else:
             status_message = 'I don’t know you!'
