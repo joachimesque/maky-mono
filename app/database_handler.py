@@ -28,32 +28,38 @@ def add_message(message, message_id, date):
   if(not message or not message_id or not date):
     return False
 
-  Message(message=message,
-          created_at=datetime.datetime.now(datetime.timezone.utc),
-          tg_message_id=message_id,
-          tg_date=date
-         )
-  return True
+  message_obj = Message(message=message,
+                        created_at=datetime.datetime.now(datetime.timezone.utc),
+                        tg_message_id=message_id,
+                        tg_date=date
+                       )
+  commit()
+
+  return message_obj.id
 
 @db_session
 def edit_message(message, message_id, date):
   if(not message or not message_id or not date):
     return False
 
-  message_obj = Message.get(tg_message_id = message_id)
+  message_obj = Message.get(id = message_id)
 
   if(not message_obj):
     return False
 
   message_obj.message = message
   commit()
-  return True
+
+  return message_obj.id
 
 @db_session
 def get_message_by_id(message_id):
-  if(not message_id):
-    return False
+  message_obj = Message.get(id = message_id)
 
+  return message_obj
+
+@db_session
+def get_message_by_tg_id(message_id):
   message_obj = Message.get(tg_message_id = message_id)
 
   return message_obj
@@ -78,4 +84,10 @@ def get_next_message():
 def invalidate_message(message_id):
   message = Message.get(id = message_id)
   message.published_at = datetime.datetime.now(datetime.timezone.utc)
+  commit()
+
+@db_session
+def delete_message(message_id):
+  message = Message.get(id = message_id)
+  message.delete()
   commit()
