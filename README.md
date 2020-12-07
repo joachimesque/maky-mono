@@ -104,3 +104,9 @@ Commands:
 - `/show xxx` shows you a message, replace `xxx` with `next` to see the next message that'll be published, `last` to see the last message added to the queue, or the id of any message (it’s a number)
 - `/delete xxx` deletes a message. Same values are accepted to replace `xxx` than for `/show`. Displays a warning before deleting a message.
 - `/start` has no real function right now.
+
+## About the name
+
+“_Maky_” is the malagasy name for the Lemur Catta, a lemur that lives in Madagascar. 
+The tool got this name because the maky has one of the longest tail-to-body ratio among mammals, and « queue » in French means “tail”.
+You should know that the maky is endangered. Why not help the conservation efforts, learn more on the [Lemur Conservation Network](https://www.lemurconservationnetwork.org/how-to-help/shop/)!
