@@ -1,5 +1,7 @@
 # Maky Mono
 
+![Photo of a lemur catta](https://imgur.com/ZhFK6mV)
+
 Maky Mono is a single-user tool to queue messages to be published on Twitter or Mastodon at a later date, the queue is filled by a Telegram bot.
 
 It uses Python 3.
@@ -115,6 +117,10 @@ Maky doesn't accept images and media messages _(yet)_.
 
 ## About the name
 
+![Photo of a lemur catta](https://imgur.com/ZhFK6mV)
+
 “_Maky_” is the malagasy name for the Lemur Catta, a lemur that lives in Madagascar. 
 The tool got this name because the maky has one of the longest tail-to-body ratio among mammals, and « queue » in French means “tail”.
 You should know that the maky is endangered. Why not help the conservation efforts, learn more on the [Lemur Conservation Network](https://www.lemurconservationnetwork.org/how-to-help/shop/)!
+
+The photo of the maky was taken by [Mathias Appel](https://www.flickr.com/photos/mathiasappel/25911695040) and is in the public domain. His lemur pictures are amazing, [go see them on Flickr](https://www.flickr.com/photos/144285761@N05/galleries/72157679442235730/).
