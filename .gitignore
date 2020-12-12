@@ -138,5 +138,6 @@ dmypy.json
 cython_debug/
 
 # config
-db/database.sqlite
+db/*.sqlite
 config/config.yml
+uploads/*/

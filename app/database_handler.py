@@ -1,39 +1,15 @@
 from datetime import (datetime, timezone)
-from pathlib import Path
 
-from config import get_config
+from database_models import (Image, Message)
 
-from pony.orm import (Database,
-                      Optional,
-                      PrimaryKey,
-                      Required,
-                      commit,
+from pony.orm import (commit,
                       count,
                       db_session,
                       desc,
                       select)
 
-db_config = get_config()['db']
 
-db = Database()
-
-if(db_config['type'] == 'sqlite'):
-    db_filename = db_config['sqlite']['filename']
-    db_filepath = str(Path(__file__).parents[1].joinpath(db_filename))
-
-    db.bind(provider='sqlite', filename=db_filepath, create_db=True)
-
-
-class Message(db.Entity):
-    id = PrimaryKey(int, auto=True)
-    created_at = Required(datetime)
-    published_at = Optional(datetime)
-    message = Required(str, 1000)
-    tg_message_id = Required(int, size=32, index='message_id_index')
-    tg_date = Required(datetime, index='message_date_index')
-
-db.generate_mapping(create_tables=True)
-
+# MESSAGES
 
 @db_session
 def add_message(message, message_id, date):
@@ -41,7 +17,6 @@ def add_message(message, message_id, date):
         return False
 
     message_obj = Message(message=message,
-                          created_at=datetime.now(timezone.utc),
                           tg_message_id=message_id,
                           tg_date=date)
     commit()
@@ -111,3 +86,27 @@ def delete_message(message_id):
     message = Message.get(id=message_id)
     message.delete()
     commit()
+
+
+# IMAGES
+
+@db_session
+def add_image(message_id, file_path, mime_type):
+    if(not message_id or not file_path or not mime_type):
+        return False
+
+    message_obj = Message.get(id=message_id)
+
+    image_obj = Image(message=message_obj,
+                      file_path=file_path,
+                      mime_type=mime_type)
+    commit()
+
+    return image_obj.id
+
+
+@db_session
+def get_images_by_message_id(message_id):
+    image_obj = Image.select(message=message_id)
+
+    return [i for i in image_obj]
