@@ -20,7 +20,6 @@ from telegram.ext import (Updater,
                           CallbackQueryHandler,
                           Filters)
 import datetime
-from message_utils import text_abuse_check
 
 
 # BASIC CONFIG
@@ -83,13 +82,13 @@ def check_double_message(message_date, message_id):
 
 
 # MAIN HANDLERS
-def handle_start(update, context):
+def start(update, context):
     response_text = 'Hello to you, too!'
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text=response_text)
 
 
-def handle_show(update, context):
+def show(update, context):
     if not context.args:
         response_text = ("No argument given.\n"
                          "You can type '/show next', '/show last', "
@@ -119,7 +118,7 @@ def handle_show(update, context):
                              text=response_text)
 
 
-def handle_delete(update, context):
+def delete(update, context):
     if not context.args:
         response_text = "No argument given.\n" \
                         "You can type '/delete next', '/delete last', " \
@@ -140,15 +139,10 @@ def handle_delete(update, context):
     update.message.reply_text('Are you sure?', reply_markup=reply_markup)
 
 
-def handle_post_message(update, context):
+def post_message(update, context):
     if update.message:
         message = update.message
-
-        abuse_check_result = text_abuse_check(message.text)
-        if abuse_check_result[0] is False:
-            status_message = abuse_check_result[1]
-
-        elif check_user(message.chat.id):
+        if check_user(message.chat.id):
             check_message_length(message.text,
                                  update=update,
                                  context=context)
@@ -181,12 +175,7 @@ def handle_post_message(update, context):
 
     elif update.edited_message:
         message = update.edited_message
-
-        abuse_check_result = text_abuse_check(message.text)
-        if abuse_check_result[0] is False:
-            status_message = abuse_check_result[1]
-
-        elif check_user(message.chat.id):
+        if check_user(message.chat.id):
             check_message_length(message.text,
                                  update=update,
                                  context=context)
@@ -213,7 +202,7 @@ def handle_post_message(update, context):
                              text=status_message)
 
 
-def handle_post_image(update, context):
+def post_image(update, context):
     message_id = None
     update_id = update.update_id
     chat_id = update.message.chat.id
@@ -272,7 +261,7 @@ def handle_post_image(update, context):
                              text=status_message)
 
 
-def handle_button(update, context):
+def button(update, context):
     query = update.callback_query
 
     query.answer()
@@ -310,15 +299,15 @@ def main():
     updater = Updater(token=telegram_config['token'], use_context=True)
     dispatcher = updater.dispatcher
 
-    dispatcher.add_handler(CommandHandler('start', handle_start))
-    dispatcher.add_handler(CommandHandler('show', handle_show))
-    dispatcher.add_handler(CommandHandler('delete', handle_delete))
+    dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(CommandHandler('show', show))
+    dispatcher.add_handler(CommandHandler('delete', delete))
     dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command),
-                           handle_post_message))
+                           post_message))
     dispatcher.add_handler(MessageHandler(Filters.photo |
                                           Filters.document.image,
-                                          handle_post_image))
-    dispatcher.add_handler(CallbackQueryHandler(handle_button))
+                                          post_image))
+    dispatcher.add_handler(CallbackQueryHandler(button))
     # Start the Bot
     updater.start_polling()
 
