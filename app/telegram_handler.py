@@ -21,6 +21,8 @@ from telegram.ext import (Updater,
                           Filters)
 import datetime
 
+from message_utils import text_abuse_check
+
 
 # BASIC CONFIG
 logging_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -82,13 +84,13 @@ def check_double_message(message_date, message_id):
 
 
 # MAIN HANDLERS
-def start(update, context):
+def handle_start(update, context):
     response_text = 'Hello to you, too!'
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text=response_text)
 
 
-def show(update, context):
+def handle_show(update, context):
     if not context.args:
         response_text = ("No argument given.\n"
                          "You can type '/show next', '/show last', "
@@ -109,8 +111,8 @@ def show(update, context):
             else:
                 response_text = message_obj.message
 
-            response_text = 'Here’s message {}:\n\n{}'.format(message_obj.id,
-                                                              response_text)
+            response_text = 'Here\'s message {}:\n\n{}'.format(message_obj.id,
+                                                               response_text)
         else:
             response_text = 'There is no message.'
 
@@ -118,7 +120,7 @@ def show(update, context):
                              text=response_text)
 
 
-def delete(update, context):
+def handle_delete(update, context):
     if not context.args:
         response_text = "No argument given.\n" \
                         "You can type '/delete next', '/delete last', " \
@@ -139,10 +141,15 @@ def delete(update, context):
     update.message.reply_text('Are you sure?', reply_markup=reply_markup)
 
 
-def post_message(update, context):
+def handle_post_message(update, context):
     if update.message:
         message = update.message
-        if check_user(message.chat.id):
+
+        abuse_check_result = text_abuse_check(message.text)
+        if abuse_check_result[0] is False:
+            status_message = abuse_check_result[1]
+
+        elif check_user(message.chat.id):
             check_message_length(message.text,
                                  update=update,
                                  context=context)
@@ -175,7 +182,12 @@ def post_message(update, context):
 
     elif update.edited_message:
         message = update.edited_message
-        if check_user(message.chat.id):
+
+        abuse_check_result = text_abuse_check(message.text)
+        if abuse_check_result[0] is False:
+            status_message = abuse_check_result[1]
+
+        elif check_user(message.chat.id):
             check_message_length(message.text,
                                  update=update,
                                  context=context)
@@ -202,7 +214,7 @@ def post_message(update, context):
                              text=status_message)
 
 
-def post_image(update, context):
+def handle_post_image(update, context):
     message_id = None
     update_id = update.update_id
     chat_id = update.message.chat.id
@@ -261,7 +273,7 @@ def post_image(update, context):
                              text=status_message)
 
 
-def button(update, context):
+def handle_button(update, context):
     query = update.callback_query
 
     query.answer()
@@ -299,15 +311,15 @@ def main():
     updater = Updater(token=telegram_config['token'], use_context=True)
     dispatcher = updater.dispatcher
 
-    dispatcher.add_handler(CommandHandler('start', start))
-    dispatcher.add_handler(CommandHandler('show', show))
-    dispatcher.add_handler(CommandHandler('delete', delete))
+    dispatcher.add_handler(CommandHandler('start', handle_start))
+    dispatcher.add_handler(CommandHandler('show', handle_show))
+    dispatcher.add_handler(CommandHandler('delete', handle_delete))
     dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command),
-                           post_message))
+                           handle_post_message))
     dispatcher.add_handler(MessageHandler(Filters.photo |
                                           Filters.document.image,
-                                          post_image))
-    dispatcher.add_handler(CallbackQueryHandler(button))
+                                          handle_post_image))
+    dispatcher.add_handler(CallbackQueryHandler(handle_button))
     # Start the Bot
     updater.start_polling()
 
