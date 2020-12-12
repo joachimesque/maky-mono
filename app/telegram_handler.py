@@ -6,8 +6,9 @@ from database_handler import (add_message,
                               get_message_by_tg_id,
                               get_next_message,
                               get_last_message,
-                              delete_message)
-from image_handler import store_image
+                              delete_message,
+                              get_images_by_message_id)
+from file_handler import store_file, delete_file
 
 import logging
 from telegram import (Bot,
@@ -97,7 +98,19 @@ def show(update, context):
         message_obj = get_message_obj(arg)
 
         if message_obj:
-            response_text = message_obj.message
+            message_images = get_images_by_message_id(message_obj.id)
+
+            if len(message_images) > 1:
+                response_text = '{}\n(+ {} images)'.format(message_obj.message,
+                                                           len(message_images))
+            elif len(message_images) > 0:
+                response_text = '{}\n(+ {} image)'.format(message_obj.message,
+                                                          len(message_images))
+            else:
+                response_text = message_obj.message
+
+            response_text = 'Here’s message {}:\n\n{}'.format(message_obj.id,
+                                                              response_text)
         else:
             response_text = 'There is no message.'
 
@@ -219,12 +232,12 @@ def post_image(update, context):
         if previous_obj:
             message_id = previous_obj.id
 
-    image_result = store_image(bot=context.bot,
-                               file_id=file_id,
-                               chat_id=chat_id,
-                               update_id=update_id,
-                               message_id=message_id,
-                               mime_type=mime_type)
+    image_result = store_file(bot=context.bot,
+                              file_id=file_id,
+                              chat_id=chat_id,
+                              update_id=update_id,
+                              message_id=message_id,
+                              mime_type=mime_type)
 
     if update.message.caption:
         if post_result:
@@ -265,6 +278,11 @@ def button(update, context):
         message_obj = get_message_obj(argument=arg)
 
         if message_obj:
+            message_images = get_images_by_message_id(message_obj.id)
+
+            for file in message_images:
+                delete_file(file.file_path)
+
             delete_message(message_obj.id)
             response_text = f'Message {message_obj.id} has been deleted.'
 

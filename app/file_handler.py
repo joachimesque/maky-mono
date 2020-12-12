@@ -46,3 +46,9 @@ def store_file(bot,
         return(True, 'The image was sent.')
     else:
         return(False, 'The image wasn’t uploaded.')
+
+
+def delete_file(file_path):
+    path_to_unlink = Path(__file__).parents[1].joinpath('uploads', file_path)
+
+    path_to_unlink.unlink()
