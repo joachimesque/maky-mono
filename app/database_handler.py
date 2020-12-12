@@ -103,3 +103,10 @@ def add_image(message_id, file_path, mime_type):
     commit()
 
     return image_obj.id
+
+
+@db_session
+def get_images_by_message_id(message_id):
+    image_obj = Image.select(message=message_id)
+
+    return [i for i in image_obj]
