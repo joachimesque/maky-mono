@@ -8,12 +8,12 @@ from database_handler import add_image
 max_file_size = 20 * (1024 ** 2)
 
 
-def store_image(bot,
-                file_id,
-                chat_id,
-                update_id,
-                message_id,
-                mime_type=None):
+def store_file(bot,
+               file_id,
+               chat_id,
+               update_id,
+               message_id,
+               mime_type=None):
     if not message_id:
         return('no message with the image :(')
 
